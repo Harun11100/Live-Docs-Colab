@@ -9,10 +9,10 @@ const Documents = () => {
   return (
     <div>
     <Header >
-      {/* <div className='flex w-fit items-center justify-center gap-2'>
-           <p className='document-title'>This me from header</p>
-      </div> */}
-      hello
+      <div className='flex w-fit items-center justify-center gap-2'>
+           <p className='document-title'>This is me from header</p>
+      </div>
+
       <SignedOut>
         <SignInButton/>
       </SignedOut>
