@@ -1,6 +1,7 @@
-import { Link } from 'lucide-react'
+import React from 'react'
 import Image from 'next/image'
-import React, { Children } from 'react'
+import Link from 'next/link'
+
 
 
 
@@ -10,18 +11,20 @@ const Header = ({children}:HeaderProps) => {
       <Link href='/' className='md:flex-1'>
       <Image
       src='/assets/icons/logo.svg'
-      alt='logo'
+      alt='logo with name'
       width={120}
       height={32}
-      className='hidden md:block'/>
+      className='hidden md:block'
+      />
       <Image
       src='/assets/icons/logo-icon.svg'
       alt='logo'
       width={32}
       height={32}
-      className='mr-2 md:hidden'/>
+      className='mr-2 md:hidden'
+      />
       </Link>
-      {Children}
+      {children}
     </div> 
   )
 }
