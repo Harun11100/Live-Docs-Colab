@@ -31,6 +31,12 @@ if (!email) {
 }
 
 
+  // session.allow(`${user.organization}:*`, session.READ_ACCESS);
+
+  // session.allow(`${user.organization}:${user.group}:*`, session.FULL_ACCESS);
+
+
+
 try {
   const { status, body } = await liveblocks.identifyUser({
       userId: user.info.email,

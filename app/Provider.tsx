@@ -4,23 +4,24 @@ import React, { ReactNode } from 'react'
 
 import {ClientSideSuspense, LiveblocksProvider} from '@liveblocks/react/suspense' 
 import Loader from '@/components/Loader'
+import { getClerkUser } from '@/lib/actions/user.action'
 
 
 const Provider = ({children}:{children:ReactNode}) => {
   return (
-          <LiveblocksProvider authEndpoint='/api/liveblocks-auth'>
-            
-                  {/* <RoomProvider id="my-room"> */}
-            
+          <LiveblocksProvider 
+          authEndpoint='/api/liveblocks-auth'
+          resolveUsers={async({userIds})=>{
+
+            const users=await getClerkUser({userIds})
+
+            return users
+          }}
+          >
                     <ClientSideSuspense fallback={<Loader />}>
-            
                       {children}
-            
                     </ClientSideSuspense>
-            
-                  {/* </RoomProvider> */}
-            
-                </LiveblocksProvider>
+          </LiveblocksProvider>
   )
 }
 
