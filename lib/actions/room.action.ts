@@ -1,7 +1,7 @@
 'use server'
 
 import {nanoid} from 'nanoid'
-import { title } from 'process';
+
 import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { parseStringify } from '../utils';
@@ -32,7 +32,8 @@ import { parseStringify } from '../utils';
       return parseStringify(room)
 
 
-      } catch (error) {
-            console.log('Error happed while crateing the room ',error)
-      }
+      } catch (error:any) {
+            console.error('Error happened while creating the room:', error.message);
+            console.error(error.stack);
+        }
  }
