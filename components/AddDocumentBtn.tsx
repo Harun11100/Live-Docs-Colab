@@ -3,7 +3,7 @@
 import React from 'react'
 import { Button } from './ui/button'
 import Image from 'next/image'
-import { createDoument } from '@/lib/actions/room.action'
+import { createDocument, createDoument } from '@/lib/actions/room.action'
 import { useRouter } from 'next/navigation'
 const AddDocumentBtn = ({userId,email}:AddDocumentBtnProps) => {
      
@@ -14,7 +14,7 @@ const AddDocumentBtn = ({userId,email}:AddDocumentBtnProps) => {
       
              try {
 
-                 const room = createDoument({userId,email}) 
+                 const room = createDocument({userId,email}) 
             if(room) router.push(`/documents/${room.id}`)
              } catch (error) {
                 console.log(error)  

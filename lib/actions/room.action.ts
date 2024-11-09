@@ -1,57 +1,69 @@
 'use server'
 
-import {nanoid} from 'nanoid'
-
+import { nanoid } from 'nanoid';
 import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { parseStringify } from '../utils';
- 
-export const createDoument =async ({userId,email}:CreateDocumentParams)=>{
-     
-      
-      const roomId= nanoid() ;
-      try {
-               
-          const metadata={
-            creatorId:userId,
+
+// Create a new document (room) with access controls
+export const createDocument = async ({ userId, email }: { userId: string, email: string }) => {
+    const roomId = nanoid();
+    
+    try {
+        const metadata = {
+            creatorId: userId,
             email,
-            title:'Untitled'
-      }
+            title: 'Untitled'
+        };
 
-      const usersAccesses:RoomAccesses={
-             [email]:['room:write']
-      }
+        // Set user access permissions for the room
+        const userAccesses: RoomAccesses = {
+            [email]: ['room:write']
+        };
 
-      const room =await liveblocks.createRoom(roomId,{
+        // Create the room with metadata and access permissions
+        const room = await liveblocks.createRoom(roomId, {
             metadata,
-            usersAccesses,
-            defaultAccesses:[]
-      })
+            usersAccesses:userAccesses,
+            defaultAccesses: []
+        });
 
-      revalidatePath('/')
+        // Optionally revalidate cache after creating the room
+        revalidatePath('/');
 
-      return parseStringify(room)
+        // Return the created room data as a stringified JSON
+        return parseStringify(room);
 
+    } catch (error: any) {
+        console.error('Error occurred while creating the room:', error.message);
+        console.error(error.stack);
+        throw new Error('Room creation failed');
+    }
+};
 
-      } catch (error:any) {
-            console.error('Error happened while creating the room:', error.message);
-            console.error(error.stack);
+// Fetch an existing document (room) by roomId and verify user access
+export const getDocument = async ({ roomId, userId, email }: { roomId: string, userId: string, email: string }) => {
+    try {
+        // Retrieve room data from Liveblocks
+        const room = await liveblocks.getRoom(roomId);
+
+        if (!room) {
+            throw new Error('Room not found');
         }
- }
 
- export const getDocument = async ({roomId,userId}:{roomId:string,userId:string})=>{
+        // Check if the user has access to the room
+        const hasAccess = Object.keys(room.usersAccesses).includes(email); // Use email if access was granted with email
 
+        if (!hasAccess) {
+            throw new Error('You do not have access to this document');
+        }
 
-       try {
-            const room =await liveblocks.getRoom(roomId)
-         
-            const hasAccess=Object.keys(room.usersAccesses).includes(userId)
-   
-            if(!hasAccess){
-               throw new Error ('You do not have access ti this documents')
-            }
-            return parseStringify(room)
-       } catch (error) {
-             console.log(error)
-       }
- }
+        // Return the room data if access is valid
+        return parseStringify(room);
+
+    } catch (error: any) {
+        console.error('Error occurred while fetching the room:', error.message);
+        console.error(error.stack);
+        throw new Error('Failed to retrieve document');
+    }
+};
