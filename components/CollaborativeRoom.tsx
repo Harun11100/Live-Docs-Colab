@@ -1,13 +1,14 @@
  'use client'
 
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense'
-import React, { ReactNode, useRef, useState } from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Editor } from '@/components/editor/Editor'
 import Header from '@/components/header'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ActiveCollaborator from './ActiveCollaborator'
 import { Input } from './ui/input'
 import Image from 'next/image'
+import { updateDocument } from '@/lib/actions/room.action'
 const  CollaborativeRoom = ({roomId,roomMetadata}:CollaborativeRoomProps) => {
   
      const currentUserType = roomId
@@ -20,12 +21,66 @@ const  CollaborativeRoom = ({roomId,roomMetadata}:CollaborativeRoomProps) => {
      const containerRef=useRef<HTMLDivElement>(null)
      const InputRef=useRef<HTMLDivElement>(null)
       
-     const updateTitleHandler =(e:React.KeyboardEvent<HTMLInputElement>)=>{
+     
+     
+     const updateTitleHandler = async (e:React.KeyboardEvent<HTMLInputElement>)=>{
+
+     if(e.key==='Enter'){
+      setLoading(true)
+   try {
+
+      if(documentTitle !==roomMetadata.title){
+         const updatedDocument= await updateDocument(roomId,documentTitle)
+
+         if(updatedDocument){
+            setEditiing(false)
+         }
+      
+      }
+
+      
+
+          
+
+   
+     } catch (error) { 
+      console.log(error)
+}
+
+     } 
+     setLoading(false)
 
      }
 
+     useEffect(()=>{
 
-     return (
+      const handleClickOutside=(e:MouseEvent)=>{
+
+          if(containerRef.current && !containerRef.current.contains(e.target as Node)){ 
+            setEditiing(false)
+            updateDocument(roomId,documentTitle);
+          }
+
+      
+      }
+      document.addEventListener('mousedown',handleClickOutside);
+
+      return ()=>{
+         document.removeEventListener('mousedown',handleClickOutside)
+      }
+
+     },[roomId,documentTitle])
+
+     useEffect(()=>{
+      
+      if(editing && InputRef.current){
+         InputRef.current.focus()
+      }
+
+     },[editing])
+
+
+     return ( 
       <RoomProvider id="my_room">
 
             <ClientSideSuspense fallback={<div>Loading…</div>}>
