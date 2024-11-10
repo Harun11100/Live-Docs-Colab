@@ -9,6 +9,7 @@ import ActiveCollaborator from './ActiveCollaborator'
 import { Input } from './ui/input'
 import Image from 'next/image'
 import { updateDocument } from '@/lib/actions/room.action'
+import Loader from './Loader'
 const  CollaborativeRoom = ({roomId,roomMetadata}:CollaborativeRoomProps) => {
   
      const currentUserType = roomId
@@ -83,7 +84,7 @@ const  CollaborativeRoom = ({roomId,roomMetadata}:CollaborativeRoomProps) => {
      return ( 
       <RoomProvider id="my_room">
 
-            <ClientSideSuspense fallback={<div>Loading…</div>}>
+            <ClientSideSuspense fallback={<div><Loader/></div>}>
 
                         <div className='collaborative-room'>
 
