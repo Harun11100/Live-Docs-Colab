@@ -10,9 +10,9 @@ import { Input } from './ui/input'
 import Image from 'next/image'
 import { updateDocument } from '@/lib/actions/room.action'
 import Loader from './Loader'
-const  CollaborativeRoom = ({roomId,roomMetadata}:CollaborativeRoomProps) => {
+const  CollaborativeRoom = ({roomId,roomMetadata,users,currentUserType}:CollaborativeRoomProps) => {
   
-     const currentUserType = roomId
+  
 
      const [documentTitle,setDocumentTitle]=useState(roomMetadata.title)
        
@@ -135,7 +135,7 @@ const  CollaborativeRoom = ({roomId,roomMetadata}:CollaborativeRoomProps) => {
                             <UserButton/>
                         </SignedIn>
                   </Header>
-                        <Editor/>
+                        <Editor roomId={roomId} currentUserType={currentUserType}/>
 
                         </div>
 
