@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { parseStringify } from '../utils';
+import { title } from 'process';
 
 // Create a new document (room) with access controls
 export const createDocument = async ({ userId, email }: { userId: string, email: string }) => {
@@ -67,3 +68,30 @@ export const getDocument = async ({ roomId, userId, email }: { roomId: string, u
         throw new Error('Failed to retrieve document');
     }
 };
+
+export const updateDocument=async (roomId:string,documentTitle:string)=>{
+
+
+try {
+   
+    const updatedRoom=await liveblocks.updateRoom(roomId,{
+        metadata:{
+            documentTitle,
+
+        }
+    })  
+
+    revalidatePath(`/documents/${roomId}`);
+
+    return parseStringify(updatedRoom)
+
+} catch (error) {
+    console.log(error)
+}
+
+
+
+
+
+
+}
