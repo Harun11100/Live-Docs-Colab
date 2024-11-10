@@ -3,7 +3,7 @@
 import { nanoid } from 'nanoid';
 import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
-import { parseStringify } from '../utils';
+import { getAccessType, parseStringify } from '../utils';
 import { title } from 'process';
 
 // Create a new document (room) with access controls
@@ -43,7 +43,7 @@ export const createDocument = async ({ userId, email }: { userId: string, email:
 };
 
 // Fetch an existing document (room) by roomId and verify user access
-export const getDocument = async ({ roomId, userId, email }: { roomId: string, userId: string, email: string }) => {
+export const getDocument = async ({ roomId, userId}: { roomId: string, userId: string}) => {
     try {
         // Retrieve room data from Liveblocks
         const room = await liveblocks.getRoom(roomId);
@@ -53,7 +53,7 @@ export const getDocument = async ({ roomId, userId, email }: { roomId: string, u
         }
 
         // Check if the user has access to the room
-        const hasAccess = Object.keys(room.usersAccesses).includes(email); // Use email if access was granted with email
+        const hasAccess = Object.keys(room.usersAccesses).includes(userId); // Use email if access was granted with email
 
         if (!hasAccess) {
             throw new Error('You do not have access to this document');
@@ -106,3 +106,44 @@ export const getDocuments = async ( email: string) => {
         throw new Error('Failed to retrieve document');
     }
 };
+
+export const updateDocumentAccess=async ({roomId,email,userType,updatedBy}:ShareDocumentParams)=>{
+
+    try {
+             const usersAccesses:RoomAccesses={
+                 [email]:getAccessType(userType)as AccessType,
+             }    
+             const room =await liveblocks.updateRoom(roomId,{usersAccesses})
+
+            if(room){
+
+            }
+           revalidatePath(`/documents/${roomId}`)
+
+           return parseStringify(room)
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+export const removeCollaborator =async ({ roomId,email}:{roomId:string,email:string})=>{
+    try {
+       
+        const room = await liveblocks.getRoom(roomId)
+        if(room.metadata.email===email){
+            throw new Error('Owner cannot be deleted from the room ')
+        }
+
+        const updatedRoom= await liveblocks.updateRoom(roomId,{
+            usersAccesses:{
+                [email]:null
+            }
+        })
+
+        revalidatePath(`/documents/${roomId}`)
+        return parseStringify(updatedRoom)
+    } catch (error) {
+         console.log(error)
+    }
+}
