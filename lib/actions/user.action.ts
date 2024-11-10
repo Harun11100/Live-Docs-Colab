@@ -48,7 +48,7 @@ try {
 
 
 } catch (error) {
-  console.log('Error fatcing documents users',error)
+  console.log('Error fatching documents users',error)
 }
 
 }
