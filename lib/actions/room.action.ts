@@ -88,10 +88,21 @@ try {
 } catch (error) {
     console.log(error)
 }
-
-
-
-
-
-
 }
+
+
+export const getDocuments = async ( email: string) => {
+    try {
+        // Retrieve room data from Liveblocks
+        const rooms = await liveblocks.getRooms({userId:email});
+      
+
+        // Return the room data if access is valid
+        return parseStringify(rooms);
+
+    } catch (error: any) {
+        console.error('Error occurred while fetching the rooms:', error.message);
+        console.error(error.stack);
+        throw new Error('Failed to retrieve document');
+    }
+};
