@@ -76,10 +76,7 @@ export function Editor(roomId:string,currentUserType:string) {
           <FloatingThreads threads={threads}/>
           <Comments/>
          </LiveblocksPlugin>
-        </div>
-       
-
-        
+        </div>  
       </div>
     </LexicalComposer>
   );
