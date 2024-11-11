@@ -5,6 +5,7 @@ import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { getAccessType, parseStringify } from '../utils';
 import { title } from 'process';
+import { redirect } from 'next/navigation';
 
 // Create a new document (room) with access controls
 export const createDocument = async ({ userId, email }: { userId: string, email: string }) => {
@@ -146,4 +147,16 @@ export const removeCollaborator =async ({ roomId,email}:{roomId:string,email:str
     } catch (error) {
          console.log(error)
     }
+}
+
+export const deleteDocument=async(roomId:string)=>{
+
+       try {
+             await liveblocks.deleteRoom(roomId)
+            redirect('/')
+            
+       } catch (error) {
+        console.log(error)
+       }
+
 }
