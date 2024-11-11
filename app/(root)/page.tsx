@@ -6,9 +6,12 @@ import { currentUser } from '@clerk/nextjs/server'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import React from 'react'
-import { metadata } from '../layout'
+
 import Link from 'next/link'
 import { dateConverter } from '@/lib/utils'
+import { DeleteModal } from '@/components/DeleteModal'
+
+
 
 const Home = async() => {
 
@@ -16,7 +19,9 @@ const Home = async() => {
   if(!clerkUser)redirect('./sign-in')
 
   const roomDocuments= await getDocuments(clerkUser.emailAddresses[0].emailAddress)
+
   
+
   return (
     <main className='home-container'>
        <Header className='sticky left-0 top-0'>
@@ -58,14 +63,13 @@ const Home = async() => {
                     
                     
                     </Link>
-
+                    <DeleteModal roomId={id} />
 
                    </li>
                  ))}
             </ul>
         </div>
        )
-       
        
        : 
        <div className='document-list-empty'>
