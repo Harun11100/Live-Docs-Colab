@@ -153,7 +153,11 @@ export const deleteDocument=async(roomId:string)=>{
 
        try {
              await liveblocks.deleteRoom(roomId)
-            redirect('/')
+             
+             revalidatePath('/')
+            
+             redirect('/')
+        
             
        } catch (error) {
         console.log(error)
