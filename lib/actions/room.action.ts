@@ -4,11 +4,11 @@ import { nanoid } from 'nanoid';
 import { liveblocks } from '../liveblocks';
 import { revalidatePath } from 'next/cache';
 import { getAccessType, parseStringify } from '../utils';
-import { title } from 'process';
+
 import { redirect } from 'next/navigation';
 
 // Create a new document (room) with access controls
-export const createDocument = async ({ userId, email }: { userId: string, email: string }) => {
+export const createDocument = async ({ userId, email }: CreateDocumentParams) => {
     const roomId = nanoid();
     
     try {
@@ -19,14 +19,14 @@ export const createDocument = async ({ userId, email }: { userId: string, email:
         };
 
         // Set user access permissions for the room
-        const userAccesses: RoomAccesses = {
+        const usersAccesses: RoomAccesses = {
             [email]: ['room:write']
         };
 
         // Create the room with metadata and access permissions
         const room = await liveblocks.createRoom(roomId, {
             metadata,
-            usersAccesses:userAccesses,
+            usersAccesses,
             defaultAccesses: []
         });
 
@@ -64,15 +64,10 @@ export const getDocument = async ({ roomId, userId}: { roomId: string, userId: s
         return parseStringify(room);
 
     } catch (error: any) {
-        console.error('Error occurred while fetching the room:', error.message);
-        console.error(error.stack);
-        throw new Error('Failed to retrieve document');
+          console.log(error)
     }
 };
-
 export const updateDocument=async (roomId:string,documentTitle:string)=>{
-
-
 try {
    
     const updatedRoom=await liveblocks.updateRoom(roomId,{
@@ -81,7 +76,6 @@ try {
 
         }
     })  
-
     revalidatePath(`/documents/${roomId}`);
 
     return parseStringify(updatedRoom)
@@ -90,8 +84,6 @@ try {
     console.log(error)
 }
 }
-
-
 export const getDocuments = async ( email: string) => {
     try {
         // Retrieve room data from Liveblocks
