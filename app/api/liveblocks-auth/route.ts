@@ -3,52 +3,48 @@ import { getUserColor } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-
 export async function POST(request: Request) {
+    const clerkUser = await currentUser();
 
-   const clerkUser= await currentUser() 
-  // Get the current user from your database
-    if(!clerkUser) redirect('./sign-in')
+    // Check for user authentication and email existence
+    if (!clerkUser || !clerkUser.emailAddresses?.[0]?.emailAddress) {
+        console.error("User not authenticated or email not found.");
+        return new Response(null, {
+            status: 307,
+            headers: { Location: '/sign-in' },
+        });
+    }
 
+    const { id, firstName, lastName, emailAddresses, imageUrl } = clerkUser;
 
-   const {id,firstName,lastName,emailAddresses,imageUrl}=clerkUser
-   
-   const user ={
-         id,
-         info:{
+    const user = {
+        id,
+        info: {
             id,
-           name:`${firstName} ${lastName}`,
-            email:emailAddresses[0].emailAddress,
-            avatar:imageUrl,
-            color:getUserColor(id) 
-         }
-   }
+            name: `${firstName} ${lastName}`,
+            email: emailAddresses[0].emailAddress,
+            avatar: imageUrl,
+            color: getUserColor(id),
+        },
+    };
 
-const email = emailAddresses[0]?.emailAddress;
-if (!email) {
-    console.error("User email not found.");
-    redirect('/sign-in');
+    try {
+        const { status, body } = await liveblocks.identifyUser(
+            {
+                userId: user.info.email,
+                groupIds: [],
+            },
+            {
+                userInfo: user.info,
+            }
+        );
+
+        return new Response(JSON.stringify(body), {
+            status,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    } catch (error) {
+        console.error('Error in /api/liveblocks-auth:', error.message, error.stack);
+        return new Response('Authentication failed', { status: 500 });
+    }
 }
-
-
-  // session.allow(`${user.organization}:*`, session.READ_ACCESS);
-
-  // session.allow(`${user.organization}:${user.group}:*`, session.FULL_ACCESS);
-
-
-
-try {
-  const { status, body } = await liveblocks.identifyUser({
-      userId: user.info.email,
-      groupIds: []
-  }, {
-      userInfo: user.info
-  });
-  return new Response(body, { status });
-} catch (error) {
-  console.error('Error in /api/liveblocks-auth:', error);
-  return new Response('Authentication failed', { status: 500 });
-}
-
-} 
-
